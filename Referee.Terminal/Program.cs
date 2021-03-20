@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Referee.Terminal
@@ -10,24 +11,46 @@ namespace Referee.Terminal
             try
             {
                 var ko = new Knockout();
-                var subforum = await ko.GetSubforumAsync(1);
-                var page = await subforum.GetPageAsync(1);
-
-                Console.WriteLine($"Subforum: {subforum.Name}");
-                Console.WriteLine($"(Threads: {subforum.ThreadCount})");
-
-                if (page != null)
+                
+                while (true)
                 {
-                    Console.WriteLine($"(Page {page.PageNumber}/{page.PageCount})\n");
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.Write("userid> ");
+                    var userIdText = Console.ReadLine().Trim();
+                    Console.ResetColor();
 
-                    foreach (var thread in page.Threads)
+                    if (!uint.TryParse(userIdText, out uint userId)) continue;
+
+                    var user = await ko.GetUserAsync(userId);
+
+                    if (user == null)
                     {
-                        Console.WriteLine($"-> {thread.Title}");
-                        Console.ForegroundColor = ConsoleColor.DarkGray;
-                        Console.WriteLine($"  - by {thread.Author}");
-                        Console.WriteLine($"  - {thread.PostCount} post(s)");
+                        Console.WriteLine("User not found.");
+                        continue;
+                    }
+
+                    Console.WriteLine();
+
+                    var bans = (await user.GetBansAsync()).ToList();
+
+                    if (user.IsBanned)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.Write("[BANNED] ");
                         Console.ResetColor();
                     }
+                    Console.WriteLine($"{user.Username}#{user.Id}");
+
+                    Console.WriteLine($"\nBans ({bans.Count})\n");
+
+                    foreach(var ban in bans)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Magenta;
+                        Console.WriteLine(ban);
+                        Console.ResetColor();
+                    }
+
+                    Console.WriteLine();
                 }
             }
             catch (KnockoutException ex)

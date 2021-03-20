@@ -13,7 +13,7 @@ namespace Referee
     public sealed class Post : KnockoutObject
     {
         [DataMember(Name = "thread")]
-        public Thread OwningThread { get; private set; }
+        public uint ThreadId { get; private set; }
 
         [DataMember(Name = "createdAt")]
         public DateTime CreatedTime { get; private set; }

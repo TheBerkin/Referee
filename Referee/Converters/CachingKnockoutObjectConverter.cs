@@ -16,27 +16,27 @@ namespace Referee.Converters
         {
             if (serializer.Context.Context is Knockout ko)
             {
-                var userObj = JObject.Load(reader);
-                var userId = userObj.Property("id")?.Value?.Value<uint>() ?? throw new KeyNotFoundException($"Missing ID in Knockout object (path: {reader.Path})");
-
+                var path = reader.Path;
+                var jsonObject = JObject.Load(reader);
+                var objId = jsonObject.Property("id")?.Value?.Value<uint>() ?? throw new KeyNotFoundException($"Missing ID in Knockout object (path: {path})");
                 var koCache = _knockoutObjectCache.GetOrCreateValue(ko);
 
-                if (!koCache.TryGetValue(userId, out var cachedObject))
+                if (!koCache.TryGetValue(objId, out var cachedObject))
                 {
-                    var kobj = userObj.ToObject<T>()!;
-                    koCache[userId] = kobj;
+                    var kobj = jsonObject.ToObject<T>()!;
+                    koCache[objId] = kobj;
                     return kobj;
                 }
 
                 lock (cachedObject.LockObject)
                 {
-                    serializer.Populate(userObj.CreateReader(), cachedObject);
+                    serializer.Populate(jsonObject.CreateReader(), cachedObject);
                     return cachedObject;
                 }
             }
             else
             {
-                return serializer.Deserialize<User>(reader);
+                return serializer.Deserialize<T>(reader);
             }
         }
 

@@ -14,8 +14,6 @@ namespace Referee
 {
     public sealed partial class Knockout
     {
-        private readonly HttpClient _http = new();
-
         private static void ThrowErrorForStatusCode(HttpStatusCode statusCode)
         {
             throw new KnockoutException($"Server responded with status code {(int)statusCode} (\"{HttpHelper.GetStatusCodeDescription(statusCode)}\")", KnockoutErrorType.ApiError);
@@ -35,11 +33,7 @@ namespace Referee
         }
 
         private void AssignHeaders(HttpRequestMessage request)
-        {
-            if (_authToken != null)
-            {
-                request.Headers.Add("Cookie", $"knockoutJwt={_authToken}");
-            }
+        {            
         }
 
         private async Task<T> DeserializeResponseAsync<T>(HttpResponseMessage response, CancellationToken cancellationToken = default)

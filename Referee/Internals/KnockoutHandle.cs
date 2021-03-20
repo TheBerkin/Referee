@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Referee
+namespace Referee.Internals
 {
     [DataContract]
-    public abstract class KnockoutObject
+    internal struct KnockoutHandle
     {
-        internal readonly object LockObject = new();
-
         [DataMember(Name = "id", IsRequired = true)]
         public uint Id { get; private set; }
-
-        public Knockout Context { get; internal set; }
     }
 }
