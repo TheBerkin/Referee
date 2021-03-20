@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
+using Referee.Serialization;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -40,6 +42,14 @@ namespace Referee
             }
         }
 
+        private async Task<T> DeserializeResponseAsync<T>(HttpResponseMessage response, CancellationToken cancellationToken = default)
+        {
+            using (var reader = new JsonTextReader(new StreamReader(await response.Content.ReadAsStreamAsync())))
+            {
+                return _serializer.Deserialize<T>(reader)!;
+            }
+        }
+
         internal async Task<HttpResponseMessage> GetAsync(string url, bool throwOnError = true, CancellationToken cancellationToken = default)
         {
             try
@@ -73,7 +83,7 @@ namespace Referee
 
             if (response.IsSuccessStatusCode)
             {
-                return JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync()).OwnedBy(this);
+                return (await DeserializeResponseAsync<T>(response, cancellationToken)).OwnedBy(this);
             }
 
             if (response.IsNotFound())
@@ -90,7 +100,7 @@ namespace Referee
         {
             var response = await GetAsync(url, true, cancellationToken);
 
-            return JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync()).OwnedBy(this);
+            return (await DeserializeResponseAsync<T>(response, cancellationToken)).OwnedBy(this);
         }
 
         internal async Task<IEnumerable<T>> GetRequiredCollectionAsync<T>(string url, CancellationToken cancellationToken = default)
@@ -98,7 +108,7 @@ namespace Referee
         {
             var response = await GetAsync(url, true, cancellationToken);
 
-            return JsonConvert.DeserializeObject<List<T>>(await response.Content.ReadAsStringAsync()).OwnedBy(this);
+            return (await DeserializeResponseAsync<List<T>>(response, cancellationToken)).OwnedBy(this);
         }
     }
 }

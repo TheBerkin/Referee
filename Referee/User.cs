@@ -6,9 +6,6 @@ namespace Referee
     [DataContract]
     public sealed class User : KnockoutObject
     {
-        [DataMember(Name = "id", IsRequired = true)]
-        public uint Id { get; private set; }
-
         [DataMember(Name = "username", IsRequired = true)]
         public string Username { get; private set; } = "<Unknown User>";
 

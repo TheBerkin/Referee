@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Referee.Converters;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -10,11 +12,8 @@ namespace Referee
     [DataContract]
     public sealed class Post : KnockoutObject
     {
-        [DataMember(Name = "id")]
-        public string Id { get; private set; }
-
         [DataMember(Name = "thread")]
-        public uint OwningThreadId { get; private set; }
+        public Thread OwningThread { get; private set; }
 
         [DataMember(Name = "createdAt")]
         public DateTime CreatedTime { get; private set; }
@@ -32,6 +31,7 @@ namespace Referee
         public string Content { get; private set; }
 
         [DataMember(Name = "user")]
+        [JsonConverter(typeof(CachingKnockoutObjectConverter<User>))]
         public User Author { get; private set; }
 
         [DataMember(Name = "countryCode")]
@@ -42,9 +42,9 @@ namespace Referee
 
         public override bool Equals(object? obj)
         {
-            return obj is Post post && EqualityComparer<Knockout>.Default.Equals(Owner, post.Owner) && Id == post.Id;
+            return obj is Post post && EqualityComparer<Knockout>.Default.Equals(Context, post.Context) && Id == post.Id;
         }
 
-        public override int GetHashCode() => HashCode.Combine(Owner, Id);
+        public override int GetHashCode() => HashCode.Combine(Context, Id);
     }
 }

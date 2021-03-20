@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Referee.Terminal
@@ -11,20 +10,38 @@ namespace Referee.Terminal
             try
             {
                 var ko = new Knockout();
+                var subforum = await ko.GetSubforumAsync(1);
+                var page = await subforum.GetPageAsync(1);
 
-                foreach(var sub in await ko.GetSubforumsAsync())
+                Console.WriteLine($"Subforum: {subforum.Name}");
+                Console.WriteLine($"(Threads: {subforum.ThreadCount})");
+
+                if (page != null)
                 {
-                    Console.WriteLine($"[#{sub.Id}] {sub.Name}");
-                    Console.WriteLine($"  -> {sub.Description}");
-                    Console.WriteLine($"  -> {sub.ThreadCount} threads");
-                    Console.WriteLine($"  -> {sub.PostCount} posts");
+                    Console.WriteLine($"(Page {page.PageNumber}/{page.PageCount})\n");
+
+                    foreach (var thread in page.Threads)
+                    {
+                        Console.WriteLine($"-> {thread.Title}");
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                        Console.WriteLine($"  - by {thread.Author}");
+                        Console.WriteLine($"  - {thread.PostCount} post(s)");
+                        Console.ResetColor();
+                    }
                 }
+            }
+            catch (KnockoutException ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"Knockout error: {ex.Message}");
             }
             catch (Exception ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.Error.WriteLine("YOU FUCKED UP!");
-                Console.Error.WriteLine(ex.Message);
+                Console.Error.WriteLine($"YOU FUCKED UP!\n\n{ex}");
+            }
+            finally
+            {
                 Console.ResetColor();
             }
         }

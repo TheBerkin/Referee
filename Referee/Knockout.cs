@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Referee.Internals;
+using Referee.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,12 +19,24 @@ namespace Referee
         internal const string URL_THREADS_POPULAR = URL_THREADS + "popular/";
         internal const string URL_USER = URL_BASE + "user/";
 
+        private readonly KnockoutJsonSerializer _serializer;
+
         private string? _authToken = null;
+
+        public Knockout()
+        {
+            _serializer = new KnockoutJsonSerializer(this);
+        }
 
         public Knockout SetAuthenticationToken(string authToken)
         {
             _authToken = authToken;
             return this;
+        }
+
+        public async Task<Subforum?> GetSubforumAsync(uint subforumId, int page = 1, CancellationToken cancellationToken = default)
+        {
+            return await GetObjectAsync<Subforum>($"{URL_SUBFORUM}{subforumId}/{page}", cancellationToken);
         }
 
         public async Task<IEnumerable<Subforum>> GetSubforumsAsync(CancellationToken cancellationToken = default)

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Referee.Converters;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -16,8 +18,9 @@ namespace Referee
         [DataMember(Name = "viewers")]
         private readonly ViewerInfo _viewerInfo = new();
 
-        [DataMember(Name = "id", IsRequired = true)]
-        public uint Id { get; private set; }
+        [DataMember(Name = "user")]
+        [JsonConverter(typeof(CachingKnockoutObjectConverter<User>))]
+        public User Author { get; private set; }
 
         [DataMember(Name = "title")]
         public string Title { get; private set; } = string.Empty;

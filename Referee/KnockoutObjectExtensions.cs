@@ -10,7 +10,7 @@ namespace Referee
     {
         public static T OwnedBy<T>(this T koObj, Knockout owner) where T : KnockoutObject
         {
-            koObj.Owner = owner;
+            koObj.Context = owner;
             return koObj;
         }
 
@@ -18,7 +18,7 @@ namespace Referee
         {
             return koObjects.Select(o =>
             {
-                o.Owner = owner;
+                o.Context = owner;
                 return o;
             });
         }
