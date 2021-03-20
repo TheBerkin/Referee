@@ -3,7 +3,7 @@
 namespace Referee
 {
     [DataContract]
-    public sealed class ViewerInfo
+    public struct ViewerInfo
     {
         [DataMember(Name = "memberCount")]
         public int MemberCount { get; private set; }

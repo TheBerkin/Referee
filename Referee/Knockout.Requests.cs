@@ -1,12 +1,9 @@
 ﻿using Newtonsoft.Json;
-using Referee.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -33,12 +30,14 @@ namespace Referee
         }
 
         private void AssignHeaders(HttpRequestMessage request)
-        {            
+        {
+            request.Headers.Add("User-Agent", UserAgent);
+            request.Headers.Add("Connection", "keep-alive");
         }
 
         private async Task<T> DeserializeResponseAsync<T>(HttpResponseMessage response, CancellationToken cancellationToken = default)
         {
-            using (var reader = new JsonTextReader(new StreamReader(await response.Content.ReadAsStreamAsync())))
+            using (var reader = new JsonTextReader(new StreamReader(await response.Content.ReadAsStreamAsync(cancellationToken))))
             {
                 return _serializer.Deserialize<T>(reader)!;
             }
@@ -48,11 +47,7 @@ namespace Referee
         {
             try
             {
-                var request = new HttpRequestMessage
-                {
-                    Method = HttpMethod.Get,
-                    RequestUri = new Uri(url),
-                };
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
 
                 AssignHeaders(request);
 

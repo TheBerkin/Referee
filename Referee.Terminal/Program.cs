@@ -32,6 +32,7 @@ namespace Referee.Terminal
                     Console.WriteLine();
 
                     var bans = (await user.GetBansAsync()).ToList();
+                    var totalBanTime = TimeSpan.Zero;
 
                     if (user.IsBanned)
                     {
@@ -45,10 +46,13 @@ namespace Referee.Terminal
 
                     foreach(var ban in bans)
                     {
+                        totalBanTime += ban.GetDuration();
                         Console.ForegroundColor = ConsoleColor.Magenta;
                         Console.WriteLine(ban);
                         Console.ResetColor();
                     }
+
+                    Console.WriteLine($"\nTotal ban time: {totalBanTime.Days} day(s)");
 
                     Console.WriteLine();
                 }

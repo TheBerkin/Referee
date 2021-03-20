@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -51,7 +52,7 @@ namespace Referee
         public Knockout SetAuthenticationToken(string authToken)
         {
             _authToken = authToken;
-            _httpHandler.CookieContainer.Add(new System.Net.Cookie(COOKIE_KEY_JWT, authToken));
+            _httpHandler.CookieContainer.Add(new Cookie(COOKIE_KEY_JWT, authToken));
             return this;
         }
 
